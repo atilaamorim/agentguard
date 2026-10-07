@@ -210,16 +210,66 @@ def scan_codex_config(text, path):
             "Codex config sets approval_policy=never and sandbox_mode=danger-full-access together.",
         )
     ]
+
+
+def _allows_without_approval(value):
+    """Return whether an OpenCode permission grants an unbounded allow."""
+    if value == "allow":
+        return True
+    return isinstance(value, dict) and value.get("*") == "allow"
+
+
 def scan_provider_config(data, path):
     """Inspect provider-specific agent settings with high-signal security implications."""
     if not isinstance(data, dict):
         return []
 
     path_parts = {part.lower() for part in Path(path).parts}
-    if Path(path).name.lower() != "settings.json" or ".gemini" not in path_parts:
-        return []
-
     findings = []
+
+    if Path(path).name.lower() in {"opencode.json", "opencode.jsonc"}:
+        permissions = data.get("permission")
+        if isinstance(permissions, dict):
+            if _allows_without_approval(permissions.get("bash")):
+                findings.append(
+                    finding(
+                        "AG-OPENCODE-001",
+                        path,
+                        1,
+                        "OpenCode permission.bash allows all shell commands without approval.",
+                    )
+                )
+            if _allows_without_approval(permissions.get("edit")):
+                findings.append(
+                    finding(
+                        "AG-OPENCODE-002",
+                        path,
+                        1,
+                        "OpenCode permission.edit allows all file edits without approval.",
+                    )
+                )
+        elif permissions == "allow":
+            findings.extend(
+                [
+                    finding(
+                        "AG-OPENCODE-001",
+                        path,
+                        1,
+                        "OpenCode permission=allow enables unrestricted shell commands without approval.",
+                    ),
+                    finding(
+                        "AG-OPENCODE-002",
+                        path,
+                        1,
+                        "OpenCode permission=allow enables unrestricted file edits without approval.",
+                    ),
+                ]
+            )
+        return findings
+
+    if Path(path).name.lower() != "settings.json" or ".gemini" not in path_parts:
+        return findings
+
     security = data.get("security")
     if isinstance(security, dict) and security.get("autoAddToPolicyByDefault") is True:
         findings.append(
@@ -234,7 +284,7 @@ def scan_provider_config(data, path):
 def _is_structured_config(path):
     """Return whether a path should receive structured config analysis."""
     path = Path(path)
-    if path.suffix.lower() in {".json", ".yaml", ".yml"}:
+    if path.suffix.lower() in {".json", ".jsonc", ".yaml", ".yml"}:
         return True
     if path.suffix.lower() == ".toml" and ".codex" in {part.lower() for part in path.parts}:
         return True

@@ -307,6 +307,20 @@ def test_codex_rule_runs_through_scan_path(tmp_path):
     findings = __import__("agentguard.scanner", fromlist=["scan_path"]).scan_path(tmp_path)
     assert "AG-CODEX-001" in ids(findings)
 
+
+def test_opencode_unrestricted_permissions_are_flagged():
+    config = '{"permission": {"bash": "allow", "edit": {"*": "allow"}}}'
+    findings = scan_config(config, "opencode.json")
+    assert {"AG-OPENCODE-001", "AG-OPENCODE-002"} <= ids(findings)
+
+
+def test_opencode_narrow_permissions_are_not_flagged():
+    config = '{"permission": {"bash": {"*": "ask", "git status *": "allow"}, "edit": "ask"}}'
+    findings = scan_config(config, "opencode.json")
+    assert "AG-OPENCODE-001" not in ids(findings)
+    assert "AG-OPENCODE-002" not in ids(findings)
+
+
 def test_structured_rule_sentinels_do_not_flag_blank_lines():
     findings = scan_text("\n", "README.md")
     assert findings == []

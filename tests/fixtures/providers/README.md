@@ -12,6 +12,11 @@ These fixtures are sanitized examples for regression coverage across supported A
 - codex/config.toml exercises the explicit full-access approval combination.
 - codex/config-safe.toml is the corresponding restricted configuration.
 
+## OpenCode
+
+- opencode/opencode.json exercises unrestricted `bash` and `edit` permissions.
+- opencode-safe/opencode.json uses approval prompts and a narrow `git status` exception.
+
 ## Claude and Cursor
 
 The Claude and Cursor instruction fixtures are intentionally benign. They protect adapter/path handling and demonstrate that normal instruction content does not need to trigger provider-specific security rules.

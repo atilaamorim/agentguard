@@ -34,6 +34,19 @@ def test_codex_safe_fixture_has_no_full_access_finding():
     assert "AG-CODEX-001" not in ids(findings)
 
 
+def test_opencode_fixture_triggers_permission_rules():
+    path = FIXTURES / "opencode" / "opencode.json"
+    findings = scan_path(path)
+    assert {"AG-OPENCODE-001", "AG-OPENCODE-002"} <= ids(findings)
+
+
+def test_opencode_safe_fixture_has_no_permission_findings():
+    path = FIXTURES / "opencode-safe" / "opencode.json"
+    findings = scan_path(path)
+    assert "AG-OPENCODE-001" not in ids(findings)
+    assert "AG-OPENCODE-002" not in ids(findings)
+
+
 def test_benign_claude_fixture_is_clean():
     findings = scan_path(FIXTURES / "claude" / "CLAUDE.md")
     assert findings == []

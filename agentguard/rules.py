@@ -72,6 +72,18 @@ RULES = {
         "remediation": "Prefer approval_policy=on-request and a restricted sandbox; use full access only for an explicit, reviewed need.",
         "pattern": re.compile(r"(?!)"),
     },
+    "AG-OPENCODE-001": {
+        "severity": "high",
+        "message": "OpenCode allows unrestricted shell commands without approval",
+        "remediation": "Set the OpenCode bash permission to ask or deny, or replace the wildcard allow rule with a narrow command allowlist.",
+        "pattern": re.compile(r"(?!)"),
+    },
+    "AG-OPENCODE-002": {
+        "severity": "high",
+        "message": "OpenCode allows unrestricted file edits without approval",
+        "remediation": "Set the OpenCode edit permission to ask or deny, or replace the wildcard allow rule with a narrow path allowlist.",
+        "pattern": re.compile(r"(?!)"),
+    },
     "AG-CONTEXT-001": {
         "severity": "low",
         "message": "Agent instruction file is unusually large and may increase context cost",
