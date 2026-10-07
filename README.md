@@ -93,7 +93,42 @@ Run the built-in local demonstration:
 agentguard demo
 ```
 
-The demo uses a synthetic MCP configuration and performs no network access or file writes. Use `agentguard demo --json` for machine-readable output.
+**Example safe configuration (no findings):**
+```bash
+echo "## Agent Instructions" > SAFE_AGENT.md
+echo "Only read from approved directories" >> SAFE_AGENT.md
+agentguard scan SAFE_AGENT.md
+```
+
+**Example risky configuration (will show findings):**
+```bash
+echo "trust_all_connections: true" > UNSAFE_CONFIG.yml
+agentguard demo --json
+```
+
+The demo uses a synthetic MCP configuration and performs no network access or file writes. Use `agentguard demo --json` for machine-readable output or `agentguard demo --html` for formatted reports.
+
+### CI/CD Integration
+
+**GitHub Actions:**
+```yaml
+- name: AgentGuard Security Scan
+  uses: atilaamorim/agentguard@main
+  with:
+    path: .
+    output-format: sarif
+  env:
+    AGENTGUARD_CI: "true"
+```
+
+**CircleCI:**
+```yaml
+- run:
+    name: AgentGuard Security Scan
+    command: |
+      python -m pip install agentconfigguard
+      agentguard scan . --json > agentguard-report.json
+```
 
 ### JSON output
 
@@ -106,272 +141,4 @@ agentguard scan . --json
 SARIF works well with GitHub code-scanning workflows:
 
 ```bash
-agentguard scan . --sarif agentguard-results.sarif
-```
-
-### HTML report
-
-```bash
-agentguard scan . --html agentguard-report.html
-```
-
-### MCP security checks
-
-AgentGuard parses common `mcpServers` / MCP server configuration structures and checks for high-signal hazards:
-
-- `trust: true` — flags configurations that can bypass normal tool-call confirmation.
-- `url: http://...` (and equivalent endpoint keys) — flags unencrypted remote MCP transport.
-- Capability-chain analysis — flags a server that combines untrusted input, private-data access, and outbound actions.
-
-HTTPS endpoints are not flagged by the HTTP transport check. Remote MCP servers without declared provenance metadata also receive a low-severity transparency warning.
-
-### Ecosystem detection
-
-See which AI-agent ecosystems are present in a project:
-
-```bash
-agentguard scan . --adapters
-```
-
-AgentGuard currently recognizes Claude, Codex, Cursor, Gemini, OpenCode, and MCP configuration markers.
-
-### Context cost estimate
-
-See which agent instruction files consume the most context:
-
-```bash
-agentguard scan . --context
-```
-
-Token counts are estimates based on character length, not provider-specific billing.
-
-### Context budget gate
-
-Enforce a project-level context budget in CI:
-
-```bash
-agentguard scan . --max-context-tokens 12000
-```
-
-AgentGuard reports `AG-CONTEXT-002` when a supported instruction file exceeds the configured budget. Token counts are estimates based on character length, not provider-specific billing.
-
-### Pre-commit
-
-Run AgentGuard before each commit:
-
-```yaml
-repos:
-  - repo: https://github.com/atilaamorim/agentguard
-    rev: v0.2.1
-    hooks:
-      - id: agentguard
-```
-
-The hook blocks commits on `high` and `critical` findings by default.
-
-### Policy as code
-
-Add `.agentguard.yml` to the project root to keep CI policy with the repository:
-
-```yaml
-version: 1
-fail_on_severity: high
-max_context_tokens: 12000
-ignore:
-  - rule: AG-MCP-002
-    paths:
-      - "configs/local/*"
-```
-
-The file is discovered automatically. Use `--policy PATH` to select another file or `--no-policy` to disable automatic discovery.
-
-CLI flags take precedence over policy values.
-
-### CI severity threshold
-
-Keep lower-severity findings visible without failing the build:
-
-```bash
-agentguard scan . --fail-on-severity high
-```
-
-With this setting, `high` and `critical` findings fail CI while `medium` and `low` findings remain visible in reports.
-
-The reusable GitHub Action exposes the same control:
-
-```yaml
-      - uses: atilaamorim/agentguard@v0.2.1
-        with:
-          fail-on-severity: "high"
-```
-
-### GitHub Actions annotations
-
-When running in GitHub Actions, emit inline warnings and errors for findings:
-
-```bash
-agentguard scan . --github-annotations
-```
-
-The reusable GitHub Action enables annotations by default. Disable them when desired:
-
-```yaml
-      - uses: atilaamorim/agentguard@v0.2.1
-        with:
-          github-annotations: "false"
-```
-
-### Baseline mode
-
-For existing projects, create a baseline and then fail CI only when new findings appear:
-
-```bash
-agentguard scan . --write-baseline agentguard-baseline.json
-agentguard scan . --baseline agentguard-baseline.json
-```
-
-Baseline matching uses the rule, file path, and detected evidence. Review the baseline periodically as the project changes.
-
-## GitHub Action
-
-Use AgentGuard directly in another repository:
-
-```yaml
-name: AgentGuard
-
-on:
-  push:
-  pull_request:
-
-jobs:
-  audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: atilaamorim/agentguard@v0.2.1
-        with:
-          path: .
-```
-
-You can also enforce the context budget through the action:
-
-```yaml
-      - uses: atilaamorim/agentguard@v0.2.1
-        with:
-          max-context-tokens: "12000"
-          fail-on-findings: "true"
-```
-
-The action automatically discovers `.agentguard.yml` in the target repository. To select a different policy file:
-
-```yaml
-      - uses: atilaamorim/agentguard@v0.2.1
-        with:
-          policy: "config/agentguard.yml"
-```
-
-
-To make findings fail the job:
-
-```yaml
-      - uses: atilaamorim/agentguard@v0.2.1
-        with:
-          fail-on-findings: "true"
-```
-
-## Example
-
-```text
-🛡️ AgentGuard 0.2.1
-
-Scanning: .
-
-Security score: 71/100
-Findings: 3
-
-HIGH     AG-SEC-001      Potential secret detected — .env:4
-HIGH     AG-EXEC-001     Potential command execution capability — AGENTS.md:12
-MEDIUM   AG-PROMPT-001   Prompt-injection pattern detected — CLAUDE.md:8
-```
-
-A non-clean scan exits with status code `1`, which makes AgentGuard suitable for CI gates.
-
-## Architecture
-
-See [docs/architecture.md](docs/architecture.md) for the scanner flow, safety boundaries, and extension model.
-
-## Threat model
-
-See [docs/threat-model.md](docs/threat-model.md) for scope, limitations, and false-positive guidance.
-
-## Rule reference
-
-See [docs/rules.md](docs/rules.md) for the current rule catalog, severity, rationale, and remediation guidance.
-
-## Security regression benchmark
-
-AgentGuard ships with small, deterministic MCP fixtures under `tests/fixtures/`.
-
-Run the full regression suite with:
-
-```bash
-pytest -q
-```
-
-The benchmark intentionally includes both dangerous and safe configurations. The goal is not only to detect risky capability combinations, but also to protect against future false positives as new rules are added.
-
-## Why AgentGuard?
-
-AI agents increasingly receive access to terminals, files, credentials, MCP tools, and large instruction files. A configuration that looks harmless to a human can create meaningful security or privacy risk.
-
-AgentGuard aims to make that risk visible **before an agent runs**.
-
-## Project status
-
-AgentGuard is an early public MVP. Detection is heuristic and can produce false positives or miss sophisticated attacks. It is an auditing aid, not a guarantee that an agent, MCP server, repository, or deployment is secure.
-
-## Roadmap
-
-- [x] Local filesystem scanner
-- [x] JSON/YAML MCP config inspection
-- [x] Secret detection
-- [x] Prompt-injection heuristics
-- [x] Permission-risk heuristics
-- [x] MCP trust-bypass detection
-- [x] MCP insecure-HTTP detection
-- [x] Dangerous capability-chain detection
-- [x] Gemini CLI persistent approval detection
-- [x] Codex full-access approval detection
-- [x] Security score
-- [x] JSON output
-- [x] SARIF output
-- [x] Reusable GitHub Action
-- [x] Context bloat detection
-- [x] GitHub Action annotations
-- [x] Ecosystem detection for Claude Code, Codex, Cursor, Gemini CLI and OpenCode
-- [x] Sanitized provider configuration fixtures for supported ecosystems
-- [x] MCP registry / server metadata checks (provenance metadata)
-- [x] Context-cost estimation
-- [x] Configurable context-token CI gate
-- [x] HTML report
-- [x] Baseline mode for CI
-- [x] Versioned policy-as-code configuration
-- [x] PyPI package publication as `agentconfigguard`
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-Good starting points for contributors:
-
-- [Add OpenCode-specific security checks](https://github.com/atilaamorim/agentguard/issues/11)
-- [Add more MCP provenance regression cases](https://github.com/atilaamorim/agentguard/issues/12)
-- [Improve AgentGuard demo and onboarding examples](https://github.com/atilaamorim/agentguard/issues/13)
-
-Small, focused pull requests are welcome. New security rules should include both positive and safe regression coverage whenever practical.
-
-Security issues should follow [SECURITY.md](SECURITY.md).
-
-## License
-
-MIT
+agentguard scan . --sarif
