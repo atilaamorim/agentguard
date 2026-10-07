@@ -23,7 +23,7 @@ jobs:
       - name: Run AgentGuard
         run: agentguard scan . --json --sarif agentguard-results.sarif > agentguard-report.json || true
       - name: Upload report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: agentguard-report
           path: |

@@ -78,7 +78,7 @@ runs:
         fi
         exit 0
     - name: Upload AgentGuard reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: agentguard-results
         path: |
