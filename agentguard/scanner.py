@@ -290,12 +290,88 @@ def _is_structured_config(path):
         return True
     return False
 
+def _normalize_jsonc(text):
+    """Remove JSONC comments and trailing commas without altering string contents."""
+    output = []
+    index = 0
+    in_string = False
+    escaped = False
+    while index < len(text):
+        char = text[index]
+        if in_string:
+            output.append(char)
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            index += 1
+            continue
+        if char == '"':
+            in_string = True
+            output.append(char)
+            index += 1
+        elif char == "/" and index + 1 < len(text) and text[index + 1] == "/":
+            index += 2
+            while index < len(text) and text[index] not in "\r\n":
+                index += 1
+        elif char == "/" and index + 1 < len(text) and text[index + 1] == "*":
+            end = text.find("*/", index + 2)
+            if end == -1:
+                raise ValueError("Unterminated JSONC block comment")
+            # Keep line breaks so any later line-oriented diagnostics remain stable.
+            output.extend("\n" for c in text[index:end + 2] if c == "\n")
+            index = end + 2
+        else:
+            output.append(char)
+            index += 1
+
+    uncommented = "".join(output)
+    # JSONC permits a comma before a closing array/object bracket. Only remove
+    # commas outside strings; preserve escaped quotes and backslashes exactly.
+    output = []
+    index = 0
+    in_string = False
+    escaped = False
+    while index < len(uncommented):
+        char = uncommented[index]
+        if in_string:
+            output.append(char)
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            index += 1
+        elif char == '"':
+            in_string = True
+            output.append(char)
+            index += 1
+        elif char == ",":
+            lookahead = index + 1
+            while lookahead < len(uncommented) and uncommented[lookahead].isspace():
+                lookahead += 1
+            if lookahead < len(uncommented) and uncommented[lookahead] in "]}":
+                index += 1
+            else:
+                output.append(char)
+                index += 1
+        else:
+            output.append(char)
+            index += 1
+    return "".join(output)
+
 def scan_config(text, path):
     findings = scan_text(text, path)
     findings.extend(scan_codex_config(text, path))
     data = None
     try:
-        data = yaml.safe_load(text) if yaml else json.loads(text)
+        if Path(path).suffix.lower() == ".jsonc":
+            data = json.loads(_normalize_jsonc(text))
+        else:
+            data = yaml.safe_load(text) if yaml else json.loads(text)
     except Exception:
         pass
     if isinstance(data, dict):

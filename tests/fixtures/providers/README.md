@@ -16,6 +16,7 @@ These fixtures are sanitized examples for regression coverage across supported A
 
 - opencode/opencode.json exercises unrestricted `bash` and `edit` permissions.
 - opencode-safe/opencode.json uses approval prompts and a narrow `git status` exception.
+- opencode-jsonc/opencode.jsonc and opencode-jsonc-safe/opencode.jsonc exercise JSONC comments, trailing commas, string literals, and risky versus safe permissions.
 
 ## Claude and Cursor
 

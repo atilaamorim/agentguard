@@ -1,0 +1,8 @@
+{
+  // Unrestricted permissions should be reported.
+  "permission": {
+    "bash": "allow",
+    "edit": "ask", /* trailing comma below is valid JSONC */
+  },
+  "note": "https://example.invalid/a//b",
+}

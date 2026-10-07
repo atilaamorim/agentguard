@@ -1,0 +1,8 @@
+{
+  /* Narrow command allowlist remains safe. */
+  "permission": {
+    "bash": { "git status": "allow", "*": "ask" },
+    "edit": "ask",
+  },
+  "note": "literal /* text */ and // text",
+}
