@@ -75,6 +75,8 @@ Findings: 4
 
 The intentionally risky demo lets a new user verify the scanner immediately without connecting an agent or changing their project.
 
+![AgentGuard demo](docs/media/agentguard-demo.svg)
+
 Then scan a real repository:
 
 ```bash
