@@ -45,6 +45,17 @@ repository
       review       GitHub checks
 ```
 
+## Who is it for?
+
+AgentGuard is useful when an AI coding agent, MCP server, or provider configuration is about to gain access to commands, files, secrets, network services, or external instructions.
+
+Typical workflows:
+
+- **Local review:** `agentguard scan .` before enabling a new agent setup.
+- **CI gate:** fail a pull request when a finding reaches a chosen severity.
+- **Migration:** introduce a baseline first, then fix newly introduced findings.
+- **Provider onboarding:** check Claude, Codex, Cursor, Gemini, OpenCode, and MCP configuration before rollout.
+
 ## Try it in 10 seconds
 
 ```bash
@@ -218,6 +229,7 @@ Rules should include positive and negative regression coverage whenever practica
 
 ## Documentation
 
+- [Quick start](docs/quickstart.md)
 - [Architecture](docs/architecture.md)
 - [Threat model](docs/threat-model.md)
 - [Rule reference](docs/rules.md)
@@ -254,7 +266,9 @@ Good starting points:
 - [#12 — Add more MCP provenance regression cases](https://github.com/atilaamorim/agentguard/issues/12)
 - [#13 — Improve AgentGuard demo and onboarding examples](https://github.com/atilaamorim/agentguard/issues/13)
 
-Small, focused pull requests are welcome. Star the repository if AgentGuard is useful to your project and you want to follow future releases. New security rules should include regression coverage and remediation guidance.
+Small, focused pull requests are welcome. New security rules should include regression coverage and remediation guidance.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [the quick start](docs/quickstart.md) before opening a change.
 
 Security issues should follow [SECURITY.md](SECURITY.md).
 
