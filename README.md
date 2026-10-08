@@ -1,8 +1,9 @@
 # 🛡️ AgentGuard
 
-**Preflight security auditing for AI-agent configuration and MCP — before your agent runs.**
+**Preflight security scanner for AI-agent configuration and MCP — before the agent runs.**
 
 ![Tests](https://github.com/atilaamorim/agentguard/actions/workflows/test.yml/badge.svg)
+![CodeQL](https://github.com/atilaamorim/agentguard/actions/workflows/codeql.yml/badge.svg)
 [![PyPI](https://img.shields.io/pypi/v/agentconfigguard.svg)](https://pypi.org/project/agentconfigguard/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/agentconfigguard.svg)](https://pypi.org/project/agentconfigguard/)
 ![Python](https://img.shields.io/badge/python-3.9--3.13-blue)
@@ -13,7 +14,9 @@
 
 AgentGuard is an open-source CLI and GitHub Action that scans AI-agent instructions and MCP configuration for high-signal security and policy risks.
 
-It is **local, deterministic, read-only, and CI-friendly**: AgentGuard does not invoke agent tools or connect to configured MCP servers during a normal scan.
+**10-second start:** install `agentconfigguard`, run `agentguard demo`, then scan your repository with `agentguard scan .`.
+
+It is **local, deterministic, read-only, and CI-friendly**: normal scans do not invoke agent tools or connect to configured MCP servers.
 
 ## Why AgentGuard?
 
@@ -50,6 +53,16 @@ agentguard demo
 ```
 
 The demo is synthetic and performs **no network access and no file writes**.
+
+Typical demo result:
+
+```text
+🛡️ AgentGuard demo 0.3.1
+Security score: 31/100
+Findings: 4
+```
+
+The intentionally risky demo lets a new user verify the scanner immediately without connecting an agent or changing their project.
 
 Then scan a real repository:
 
@@ -120,7 +133,7 @@ The Action can emit:
 
 It also supports policy files, baselines, and context budgets.
 
-> **Current stable Action:** `v0.3.1`. The `main` branch contains the upcoming `v0.3.0` feature set.
+> **Current stable Action:** `v0.3.1`.
 
 ## Policy as code
 
@@ -241,7 +254,7 @@ Good starting points:
 - [#12 — Add more MCP provenance regression cases](https://github.com/atilaamorim/agentguard/issues/12)
 - [#13 — Improve AgentGuard demo and onboarding examples](https://github.com/atilaamorim/agentguard/issues/13)
 
-Small, focused pull requests are welcome. New security rules should include regression coverage and remediation guidance.
+Small, focused pull requests are welcome. Star the repository if AgentGuard is useful to your project and you want to follow future releases. New security rules should include regression coverage and remediation guidance.
 
 Security issues should follow [SECURITY.md](SECURITY.md).
 
