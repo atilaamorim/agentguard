@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">AgentGuard deterministic preflight demo</title>
+  <desc id="desc">A terminal-style card showing AgentGuard demo output with a security score of 31 out of 100 and four findings.</desc>
+  <rect width="1280" height="640" rx="28" fill="#0b0f14"/>
+  <rect x="32" y="32" width="1216" height="576" rx="22" fill="#111821" stroke="#293542" stroke-width="2"/>
+  <circle cx="76" cy="76" r="9" fill="#ff5f56"/>
+  <circle cx="108" cy="76" r="9" fill="#ffbd2e"/>
+  <circle cx="140" cy="76" r="9" fill="#27c93f"/>
+  <text x="184" y="85" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" fill="#9aa7b5">agentguard demo</text>
+
+  <text x="72" y="154" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="28" font-weight="700" fill="#f5f7fa">🛡️ AgentGuard demo 0.3.1</text>
+  <text x="72" y="204" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="24" fill="#c5d0dc">$ agentguard demo</text>
+
+  <rect x="72" y="248" width="1136" height="116" rx="18" fill="#0b0f14" stroke="#26303b"/>
+  <text x="104" y="296" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#9aa7b5">Security score</text>
+  <text x="104" y="340" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="44" font-weight="800" fill="#ffffff">31/100</text>
+  <text x="420" y="296" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#9aa7b5">Findings</text>
+  <text x="420" y="340" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="44" font-weight="800" fill="#ffffff">4</text>
+  <text x="640" y="296" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#9aa7b5">Execution</text>
+  <text x="640" y="340" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" fill="#ffffff">none</text>
+  <text x="880" y="296" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#9aa7b5">Network</text>
+  <text x="880" y="340" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" fill="#ffffff">none</text>
+
+  <text x="72" y="424" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#ffffff">What the demo proves</text>
+  <text x="72" y="470" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#c5d0dc">• Local, deterministic preflight analysis</text>
+  <text x="72" y="508" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#c5d0dc">• No agent execution</text>
+  <text x="72" y="546" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#c5d0dc">• No MCP connection</text>
+
+  <rect x="864" y="428" width="344" height="126" rx="18" fill="#15231b" stroke="#2d5740"/>
+  <text x="896" y="474" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" fill="#8fd3a8">PRE-RUNTIME CHECK</text>
+  <text x="896" y="512" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="800" fill="#ffffff">Find risks before</text>
+  <text x="896" y="544" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="800" fill="#ffffff">the agent runs</text>
+</svg>
