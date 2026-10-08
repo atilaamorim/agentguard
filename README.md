@@ -233,6 +233,7 @@ Rules should include positive and negative regression coverage whenever practica
 - [Architecture](docs/architecture.md)
 - [Threat model](docs/threat-model.md)
 - [Rule reference](docs/rules.md)
+- [AI Agent & MCP Security Checklist](docs/agent-security-checklist.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 
